@@ -1,60 +1,5 @@
-// export type Customer = {
-//   id: number;
-//   name: string;
-//   username: string;
-//   email: string;
-//   phone: string;
-//   website: string;
-//   company: {
-//     name: string;
-//   };
-// };
-
-// const API_URL =
-//   "https://jsonplaceholder.typicode.com/users";
-
-// // Barcha mijozlarni olish
-// export async function getCustomers(): Promise<Customer[]> {
-//   const response = await fetch(API_URL, {
-//     cache: "no-store",
-//   });
-
-//   if (!response.ok) {
-//     throw new Error("Customers yuklanmadi");
-//   }
-
-//   return (await response.json()) as Customer[];
-// }
-
-
-// // Bitta mijozni ID orqali olish
-// export async function getCustomer(
-//   id: string
-// ): Promise<Customer | null> {
-//   if (!/^[1-9]\d*$/.test(id)) {
-//     return null;
-//   }
-
-//   const response = await fetch(`${API_URL}/${id}`, {
-//     cache: "no-store",
-//   });
-
-//   if (response.status === 404) {
-//     return null;
-//   }
-
-//   if (!response.ok) {
-//     throw new Error("Customer yuklanmadi");
-//   }
-
-//   const customer = (await response.json()) as Customer;
-
-//   return customer?.id ? customer : null;
-// }
-
-
-
 import pool from "@/lib/db";
+import { requireUserId } from "@/lib/require-user";
 
 export type Customer = {
   id: number;
@@ -65,8 +10,14 @@ export type Customer = {
 };
 
 export async function getCustomers(): Promise<Customer[]> {
+  const userId = await requireUserId();
+
   const result = await pool.query<Customer>(
-    "SELECT id, name, email, phone, company FROM customers ORDER BY id DESC"
+    `SELECT id, name, email, phone, company
+     FROM customers
+     WHERE user_id = $1
+     ORDER BY id DESC`,
+    [userId]
   );
 
   return result.rows;
@@ -75,15 +26,21 @@ export async function getCustomers(): Promise<Customer[]> {
 export async function getCustomer(
   id: string
 ): Promise<Customer | null> {
+  const userId = await requireUserId();
   const customerId = Number(id);
 
-  if (!Number.isSafeInteger(customerId) || customerId < 1) {
+  if (
+    !/^[1-9]\d*$/.test(id) ||
+    !Number.isSafeInteger(customerId)
+  ) {
     return null;
   }
 
   const result = await pool.query<Customer>(
-    "SELECT id, name, email, phone, company FROM customers WHERE id = $1",
-    [customerId]
+    `SELECT id, name, email, phone, company
+     FROM customers
+     WHERE id = $1 AND user_id = $2`,
+    [customerId, userId]
   );
 
   return result.rows[0] ?? null;

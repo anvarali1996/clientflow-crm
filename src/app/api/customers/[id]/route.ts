@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
+import { getServerSession } from "@/lib/session";
 
 export const runtime = "nodejs";
 
@@ -7,7 +8,7 @@ type Context = {
   params: Promise<{ id: string }>;
 };
 
-// ID ni tekshirish
+// Customer ID ni tekshirish
 function parseId(id: string): number | null {
   if (!/^[1-9]\d*$/.test(id)) return null;
 
@@ -24,6 +25,19 @@ export async function PUT(
   request: Request,
   { params }: Context
 ) {
+  // 1. Login qilgan user'ni tekshiramiz
+  const session = await getServerSession();
+
+  if (!session) {
+    return NextResponse.json(
+      { message: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
+  const userId = session.user.id;
+
+  // 2. Customer ID ni olamiz
   const { id } = await params;
   const customerId = parseId(id);
 
@@ -34,6 +48,7 @@ export async function PUT(
     );
   }
 
+  // 3. Formdan kelgan ma'lumotlarni olamiz
   let body: Record<string, unknown>;
 
   try {
@@ -92,6 +107,7 @@ export async function PUT(
     );
   }
 
+  // 4. Faqat o'ziga tegishli customer'ni yangilaymiz
   try {
     const result = await pool.query(
       `UPDATE customers
@@ -100,14 +116,15 @@ export async function PUT(
          email = $2,
          phone = $3,
          company = $4
-       WHERE id = $5
-       RETURNING *`,
+       WHERE id = $5 AND user_id = $6
+       RETURNING id, name, email, phone, company`,
       [
         values.name,
         values.email,
         values.phone,
         values.company,
         customerId,
+        userId,
       ]
     );
 
@@ -152,6 +169,19 @@ export async function DELETE(
   _request: Request,
   { params }: Context
 ) {
+  // 1. Login qilgan user'ni tekshiramiz
+  const session = await getServerSession();
+
+  if (!session) {
+    return NextResponse.json(
+      { message: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
+  const userId = session.user.id;
+
+  // 2. Customer ID ni tekshiramiz
   const { id } = await params;
   const customerId = parseId(id);
 
@@ -162,12 +192,13 @@ export async function DELETE(
     );
   }
 
+  // 3. Faqat shu user'ning customerini o'chiramiz
   try {
     const result = await pool.query(
       `DELETE FROM customers
-       WHERE id = $1
+       WHERE id = $1 AND user_id = $2
        RETURNING id`,
-      [customerId]
+      [customerId, userId]
     );
 
     if (result.rows.length === 0) {

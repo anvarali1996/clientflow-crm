@@ -1,17 +1,37 @@
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
-import { getCustomers } from "@/lib/customers";
+import { getServerSession } from "@/lib/session";
 
 export const runtime = "nodejs";
 
-// GET - barcha mijozlarni olish
-export async function GET() {
-  try {
-    const customers = await getCustomers();
+// ========================================
+// GET - faqat login qilgan user mijozlari
+// ========================================
 
-    return NextResponse.json(customers);
+export async function GET() {
+  const session = await getServerSession();
+
+  if (!session) {
+    return NextResponse.json(
+      { message: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
+  const userId = session.user.id;
+
+  try {
+    const result = await pool.query(
+      `SELECT id, name, email, phone, company
+       FROM customers
+       WHERE user_id = $1
+       ORDER BY id DESC`,
+      [userId]
+    );
+
+    return NextResponse.json(result.rows);
   } catch (error) {
-    console.error(error);
+    console.error("GET customers error:", error);
 
     return NextResponse.json(
       { message: "Failed to fetch customers" },
@@ -20,16 +40,36 @@ export async function GET() {
   }
 }
 
-// POST - yangi mijoz qo'shish
+// ========================================
+// POST - yangi customer qo'shish
+// ========================================
+
 export async function POST(request: Request) {
+  const session = await getServerSession();
+
+  if (!session) {
+    return NextResponse.json(
+      { message: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
+  const userId = session.user.id;
+
   let body: Record<string, unknown>;
 
   try {
-    body = await request.json();
+    const data: unknown = await request.json();
 
-    if (!body || typeof body !== "object" || Array.isArray(body)) {
+    if (
+      !data ||
+      typeof data !== "object" ||
+      Array.isArray(data)
+    ) {
       throw new Error("Invalid body");
     }
+
+    body = data as Record<string, unknown>;
   } catch {
     return NextResponse.json(
       { message: "Invalid JSON body" },
@@ -43,11 +83,7 @@ export async function POST(request: Request) {
     typeof name !== "string" ||
     typeof email !== "string" ||
     typeof phone !== "string" ||
-    typeof company !== "string" ||
-    !name.trim() ||
-    !email.trim() ||
-    !phone.trim() ||
-    !company.trim()
+    typeof company !== "string"
   ) {
     return NextResponse.json(
       { message: "All fields are required" },
@@ -55,12 +91,21 @@ export async function POST(request: Request) {
     );
   }
 
+  const cleanName = name.trim();
+  const cleanEmail = email.trim().toLowerCase();
+  const cleanPhone = phone.trim();
+  const cleanCompany = company.trim();
+
   if (
-    name.length > 100 ||
-    email.length > 150 ||
-    phone.length > 30 ||
-    company.length > 150 ||
-    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+    !cleanName ||
+    !cleanEmail ||
+    !cleanPhone ||
+    !cleanCompany ||
+    cleanName.length > 100 ||
+    cleanEmail.length > 150 ||
+    cleanPhone.length > 30 ||
+    cleanCompany.length > 150 ||
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)
   ) {
     return NextResponse.json(
       { message: "Invalid customer information" },
@@ -70,14 +115,16 @@ export async function POST(request: Request) {
 
   try {
     const result = await pool.query(
-      `INSERT INTO customers (name, email, phone, company)
-       VALUES ($1, $2, $3, $4)
+      `INSERT INTO customers
+       (name, email, phone, company, user_id)
+       VALUES ($1, $2, $3, $4, $5)
        RETURNING id, name, email, phone, company`,
       [
-        name.trim(),
-        email.trim().toLowerCase(),
-        phone.trim(),
-        company.trim(),
+        cleanName,
+        cleanEmail,
+        cleanPhone,
+        cleanCompany,
+        userId,
       ]
     );
 
@@ -86,7 +133,8 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     if (
-      error instanceof Error &&
+      error &&
+      typeof error === "object" &&
       "code" in error &&
       error.code === "23505"
     ) {
@@ -96,7 +144,7 @@ export async function POST(request: Request) {
       );
     }
 
-    console.error("Database error:", error);
+    console.error("POST customers error:", error);
 
     return NextResponse.json(
       { message: "Failed to create customer" },

@@ -1,4 +1,5 @@
 import pool from "@/lib/db";
+import { requireUserId } from "@/lib/require-user";
 
 type DashboardStats = {
   total_customers: string;
@@ -14,8 +15,12 @@ type RecentCustomer = {
 };
 
 export async function getDashboardData() {
-  // Dashboard statistikalarini olish
-  const statsResult = await pool.query<DashboardStats>(`
+  // Login qilgan foydalanuvchining ID'si
+  const userId = await requireUserId();
+
+  // 1. Dashboard statistikasi
+  const statsResult = await pool.query<DashboardStats>(
+    `
     SELECT
       COUNT(*) AS total_customers,
 
@@ -26,15 +31,22 @@ export async function getDashboardData() {
       COUNT(DISTINCT company) AS total_companies
 
     FROM customers
-  `);
+    WHERE user_id = $1
+    `,
+    [userId]
+  );
 
-  // Oxirgi 5 ta mijozni olish
-  const customersResult = await pool.query<RecentCustomer>(`
+  // 2. Oxirgi 5 ta customer
+  const customersResult = await pool.query<RecentCustomer>(
+    `
     SELECT id, name, email, company
     FROM customers
+    WHERE user_id = $1
     ORDER BY created_at DESC, id DESC
     LIMIT 5
-  `);
+    `,
+    [userId]
+  );
 
   const stats = statsResult.rows[0];
 

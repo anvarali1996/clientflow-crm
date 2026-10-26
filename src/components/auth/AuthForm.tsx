@@ -111,7 +111,16 @@ export default function AuthForm({ mode }: Props) {
               ? "Sign Up"
               : "Sign In"}
         </button>
-
+{!isRegister && (
+  <div className="text-right">
+    <Link
+      href="/forgot-password"
+      className="text-sm text-blue-600 hover:underline"
+    >
+      Forgot Password?
+    </Link>
+  </div>
+)}
         <p className="text-center text-sm text-gray-600">
           {isRegister
             ? "Already have an account?"

@@ -1,13 +1,20 @@
 import type { ReactNode } from "react";
-
+import { redirect } from "next/navigation";
+import { getServerSession } from "@/lib/session";
 import Sidebar from "@/components/layout/Sidebar";
 import Navbar from "@/components/layout/Navbar";
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: ReactNode;
 }) {
+  const session = await getServerSession();
+
+  if (!session) {
+    redirect("/login");
+  }
+
   return (
     <div className="flex flex-col md:flex-row min-h-screen">
       <Sidebar />
