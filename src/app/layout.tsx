@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 export default function RootLayout({
@@ -8,7 +9,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+
+        <Toaster
+          position="top-right"
+          richColors
+          closeButton
+          duration={3500}
+        />
+      </body>
     </html>
   );
 }

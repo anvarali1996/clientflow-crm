@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import type { FormEvent } from "react";
-
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 type FormData = {
   name: string;
   email: string;
@@ -22,52 +23,89 @@ export default function CustomerForm() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+  const router = useRouter();
 
-  const handleSubmit = async (
-    e: FormEvent<HTMLFormElement>
-  ) => {
-    e.preventDefault();
+  // const handleSubmit = async (
+  //   e: FormEvent<HTMLFormElement>
+  // ) => {
+  //   e.preventDefault();
 
-    setLoading(true);
-    setError("");
-    setSuccess("");
+  //   setLoading(true);
+  //   setError("");
+  //   setSuccess("");
 
-    try {
-      const response = await fetch(
-        "https://jsonplaceholder.typicode.com/users",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: form.name,
-            email: form.email,
-            phone: form.phone,
-            company: {
-              name: form.company,
-            },
-          }),
-        }
-      );
+  //   try {
+  //     const response = await fetch(
+  //       "https://jsonplaceholder.typicode.com/users",
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({
+  //           name: form.name,
+  //           email: form.email,
+  //           phone: form.phone,
+  //           company: {
+  //             name: form.company,
+  //           },
+  //         }),
+  //       }
+  //     );
 
-      if (!response.ok) {
-        throw new Error("Failed to add customer");
-      }
+  //     if (!response.ok) {
+  //       throw new Error("Failed to add customer");
+  //     }
 
-      const data = await response.json();
+  //     const data = await response.json();
 
-      console.log("API Response:", data);
+  //     console.log("API Response:", data);
 
-      setSuccess("Demo POST request successful!");
-      setForm(initialForm);
-    } catch {
-      setError("Something went wrong. Try again.");
-    } finally {
-      setLoading(false);
+  //     setSuccess("Demo POST request successful!");
+  //     setForm(initialForm);
+  //   } catch {
+  //     setError("Something went wrong. Try again.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+const handleSubmit = async (
+  e: FormEvent<HTMLFormElement>
+) => {
+  e.preventDefault();
+
+  setLoading(true);
+  setError("");
+  setSuccess("");
+
+  try {
+    const response = await fetch("/api/customers", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(form),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Xatolik yuz berdi");
     }
-  };
 
+    toast.success("Mijoz muvaffaqiyatli qo'shildi!");
+
+    router.push("/dashboard/customers");
+  } catch (error) {
+    toast.error(
+      error instanceof Error
+        ? error.message
+        : "Mijozni qo'shib bo'lmadi"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <form
       onSubmit={handleSubmit}
