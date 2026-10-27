@@ -51,12 +51,14 @@ export default function ForgotPasswordPage() {
               Check Your Email
             </h1>
 
-            <p className="text-gray-600">
+            {/* <p className="text-gray-600">
               Agar bu email bilan account mavjud
               bo'lsa, parolni tiklash havolasi
               yuboriladi.
+            </p> */}
+            <p className="text-gray-600">
+             If there is a account with this email, link will send.x
             </p>
-
             <Link
               href="/login"
               className="block text-blue-600 hover:underline"

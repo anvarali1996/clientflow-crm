@@ -40,19 +40,19 @@ export const auth = betterAuth({
             subject: "ClientFlow - Reset Your Password",
 
             text: `
-Salom!
+                Salom!
 
-ClientFlow accountingiz uchun parolni
-tiklash so'rovi yuborildi.
+                ClientFlow accountingiz uchun parolni
+                tiklash so'rovi yuborildi.
 
-Parolni tiklash havolasi:
+                Parolni tiklash havolasi:
 
-${url}
+                ${url}
 
-Bu havola 1 soat amal qiladi.
+                Bu havola 1 soat amal qiladi.
 
-Agar bu so'rovni siz yubormagan
-bo'lsangiz, emailni e'tiborsiz qoldiring.
+                Agar bu so'rovni siz yubormagan
+                bo'lsangiz, emailni e'tiborsiz qoldiring.
             `.trim(),
           });
 
@@ -62,14 +62,14 @@ bo'lsangiz, emailni e'tiborsiz qoldiring.
               error.message
             );
           }
-        } catch (error) {
+            } catch (error) {
           console.error(
             "Reset email error:",
             error instanceof Error
               ? error.message
               : "Unknown error"
           );
-        }
+          }
       });
     },
   },
