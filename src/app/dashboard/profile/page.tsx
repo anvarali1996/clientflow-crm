@@ -25,7 +25,7 @@ export default async function ProfilePage() {
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 h-28" />
+        <div className="bg-linear-to-r from-blue-600 to-indigo-600 h-28" />
 
         <div className="px-6 pb-8">
           <div className="-mt-10 mb-5 relative w-fit rounded-full border-4 border-white shadow">

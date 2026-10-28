@@ -90,17 +90,17 @@ const handleSubmit = async (
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Xatolik yuz berdi");
+      throw new Error(data.message || "Something went wrong.");
     }
 
-    toast.success("Mijoz muvaffaqiyatli qo'shildi!");
+    toast.success("Customer added successfully!");
 
     router.push("/dashboard/customers");
   } catch (error) {
     toast.error(
       error instanceof Error
         ? error.message
-        : "Mijozni qo'shib bo'lmadi"
+        : "Failed to add customer."
     );
   } finally {
     setLoading(false);
@@ -154,7 +154,7 @@ const handleSubmit = async (
           onChange={(e) =>
             setForm({ ...form, phone: e.target.value })
           }
-          placeholder="+998 90 123 45 67"
+          placeholder="+371 12 345 678"
           className="w-full border border-gray-300 rounded-lg p-3"
         />
       </div>

@@ -65,7 +65,7 @@ export default function AccountSettingsForm({
 
       setName(cleanName);
 
-      toast.success("Profil muvaffaqiyatli yangilandi!");
+      toast.success("Profile updated succesfully");
 
       // Navbar va Profile ma'lumotlarini yangilaydi
       router.refresh();
@@ -73,7 +73,7 @@ export default function AccountSettingsForm({
       toast.error(
         error instanceof Error
           ? error.message
-          : "Profilni yangilab bo'lmadi"
+          : "Profile update failed"
       );
     } finally {
       setSavingName(false);
@@ -89,17 +89,17 @@ export default function AccountSettingsForm({
     e.preventDefault();
 
     if (newPassword.length < 8) {
-      toast.error("Yangi parol kamida 8 ta belgi bo'lsin");
+      toast.error("Your new password must be at least 8 characters long.");
       return;
     }
 
     if (currentPassword === newPassword) {
-      toast.error("Yangi parol eskisidan farq qilsin");
+      toast.error("Your new password must be different from your current password.");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      toast.error("Yangi parollar bir xil emas");
+      toast.error("New passwords are not the same");
       return;
     }
 
@@ -122,12 +122,12 @@ export default function AccountSettingsForm({
       setNewPassword("");
       setConfirmPassword("");
 
-      toast.success("Parol muvaffaqiyatli o'zgartirildi!");
+      toast.success("Password changed successfully");
     } catch (error) {
       toast.error(
         error instanceof Error
           ? error.message
-          : "Parolni o'zgartirib bo'lmadi"
+          : "Password change failed"
       );
     } finally {
       setSavingPassword(false);

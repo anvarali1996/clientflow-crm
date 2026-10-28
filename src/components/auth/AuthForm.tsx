@@ -44,8 +44,8 @@ export default function AuthForm({ mode }: Props) {
 
       toast.success(
         isRegister
-          ? "Account muvaffaqiyatli yaratildi!"
-          : "Xush kelibsiz!"
+          ? "Account created successfully!"
+          : "WELCOME!"
       );
 
       router.push("/dashboard");

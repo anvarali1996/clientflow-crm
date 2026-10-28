@@ -28,12 +28,12 @@ export default function AvatarUploadForm({
     e.preventDefault();
 
     if (!file) {
-      toast.error("Avval rasm tanlang");
+      toast.error("Please select an image first!");
       return;
     }
 
     if (file.size > 2 * 1024 * 1024) {
-      toast.error("Rasm 2 MB dan katta bo'lmasin");
+      toast.error("Picture must not be avobe 2mb");
       return;
     }
 
@@ -44,7 +44,7 @@ export default function AvatarUploadForm({
     ];
 
     if (!allowedTypes.includes(file.type)) {
-      toast.error("Faqat JPG, PNG yoki WebP rasm tanlang");
+      toast.error("Only JPG, PNG, or WebP images are allowed!");
       return;
     }
 
@@ -69,7 +69,7 @@ export default function AvatarUploadForm({
         );
       }
 
-      toast.success("Profil rasmi yangilandi!");
+      toast.success("Profile picture updated successfully!");
 
       setFile(null);
 
@@ -82,7 +82,7 @@ export default function AvatarUploadForm({
       toast.error(
         error instanceof Error
           ? error.message
-          : "Rasmni yuklab bo'lmadi"
+          : "Failed to upload profile picture."
       );
     } finally {
       setBusy(false);
@@ -107,7 +107,7 @@ export default function AvatarUploadForm({
         );
       }
 
-      toast.success("Profil rasmi o'chirildi!");
+      toast.success("Profile picture deleted successfully!");
 
       setFile(null);
 
@@ -120,7 +120,7 @@ export default function AvatarUploadForm({
       toast.error(
         error instanceof Error
           ? error.message
-          : "Rasmni o'chirib bo'lmadi"
+          : "Failed to delete profile picture."
       );
     } finally {
       setBusy(false);

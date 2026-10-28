@@ -21,12 +21,12 @@ export default function LogoutButton() {
         );
       }
 
-      toast.success("Accountdan muvaffaqiyatli chiqdingiz!");
+      toast.success("You have successfully logged out!");
 
       router.replace("/login");
       router.refresh();
     } catch {
-      toast.error("Logout qilishda xatolik yuz berdi");
+      toast.error("Failed to log out. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -39,7 +39,7 @@ export default function LogoutButton() {
       disabled={loading}
       className="bg-red-50 text-red-600 px-4 py-2 rounded-lg hover:bg-red-100 disabled:opacity-50"
     >
-      {loading ? "Chiqilmoqda..." : "Logout"}
+      {loading ? "Logging out..." : "Logout"}
     </button>
   );
 }

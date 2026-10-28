@@ -22,19 +22,19 @@ export default function DeleteCustomerButton({
       });
 
       if (!response.ok) {
-        throw new Error("Mijozni o'chirib bo'lmadi");
+        throw new Error("Failed to delete customer.");
       }
 
       dialogRef.current?.close();
 
-      toast.success("Mijoz muvaffaqiyatli o'chirildi!");
+      toast.success("Customer deleted successfully!");
 
       router.push("/dashboard/customers");
     } catch (error) {
       toast.error(
         error instanceof Error
           ? error.message
-          : "Xatolik yuz berdi"
+          : "Something went wrong"
       );
     } finally {
       setLoading(false);
@@ -60,12 +60,11 @@ export default function DeleteCustomerButton({
           id="delete-title"
           className="text-xl font-bold mb-3"
         >
-          Mijozni o'chirmoqchimisiz?
+          Are you sure you want to delete this customer?
         </h2>
 
         <p className="text-gray-500 mb-6">
-          Ushbu amalni ortga qaytarib bo'lmaydi.
-          Mijoz database'dan o'chiriladi.
+         This action cannot be undone. The customer will be permanently deleted from the database.
         </p>
 
         <div className="flex justify-end gap-3">
@@ -85,7 +84,7 @@ export default function DeleteCustomerButton({
             onClick={handleDelete}
             className="px-5 py-3 rounded-lg bg-red-600 hover:bg-red-700 text-white disabled:opacity-50"
           >
-            {loading ? "O'chirilmoqda..." : "Ha, o'chirish"}
+            {loading ? "Deleting..." : "Yes, Delete"}
           </button>
         </div>
       </dialog>

@@ -40,19 +40,20 @@ export const auth = betterAuth({
             subject: "ClientFlow - Reset Your Password",
 
             text: `
-                Salom!
+We received a request to reset the password for your
+ClientFlow account.
 
-                ClientFlow accountingiz uchun parolni
-                tiklash so'rovi yuborildi.
+To reset your password, please click the link below:
 
-                Parolni tiklash havolasi:
+${url}
 
-                ${url}
+This link will expire in 1 hour.
 
-                Bu havola 1 soat amal qiladi.
+If you did not request a password reset,
+you can safely ignore this email.
 
-                Agar bu so'rovni siz yubormagan
-                bo'lsangiz, emailni e'tiborsiz qoldiring.
+Best regards,
+The ClientFlow Team
             `.trim(),
           });
 
