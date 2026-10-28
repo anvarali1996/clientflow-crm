@@ -1,42 +1,104 @@
-import Link from "next/link";
+"use client";
 
-export default function Sidebar() {
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+type Props = {
+  isAdmin: boolean;
+};
+
+const links = [
+  {
+    label: "Dashboard",
+    href: "/dashboard",
+    icon: "📊",
+  },
+  {
+    label: "Customers",
+    href: "/dashboard/customers",
+    icon: "👥",
+  },
+  {
+    label: "Profile",
+    href: "/dashboard/profile",
+    icon: "👤",
+  },
+  {
+    label: "Settings",
+    href: "/dashboard/settings",
+    icon: "⚙️",
+  },
+];
+
+export default function Sidebar({ isAdmin }: Props) {
+  const pathname = usePathname();
+
+  const navigation = isAdmin
+    ? [
+        ...links,
+        {
+          label: "Admin Users",
+          href: "/dashboard/admin/users",
+          icon: "🛡️",
+        },
+      ]
+    : links;
+
   return (
-    <aside className="w-full md:w-64 md:min-h-screen bg-slate-900 text-white p-6">
-      <Link href={"/"}>
-      <h1 className="text-2xl font-bold mb-8">
-        ClientFlow
-      </h1>
-    </Link>
-      <nav className="flex md:flex-col gap-5 overflow-x-auto text-sm md:text-base">
+    <aside className="flex h-full w-64 flex-col overflow-y-auto bg-slate-900 text-white">
+      {/* LOGO */}
+      <div className="border-b border-slate-800 px-6 py-7">
         <Link
           href="/dashboard"
-          className="hover:text-blue-400 transition"
+          className="text-2xl font-bold tracking-tight text-white"
         >
-          Dashboard
+          Client<span className="text-blue-400">Flow</span>
         </Link>
 
-        <Link
-          href="/dashboard/customers"
-          className="hover:text-blue-400 transition"
-        >
-          Customers
-        </Link>
+        <p className="mt-1 text-xs text-slate-400">
+          Customer Management
+        </p>
+      </div>
 
-        <Link
-          href="/dashboard/deals"
-          className="hover:text-blue-400 transition"
-        >
-          Deals
-        </Link>
+      {/* NAVIGATION */}
+      <nav className="flex-1 space-y-2 px-4 py-6">
+        {navigation.map((link) => {
+          const active =
+            pathname === link.href ||
+            (link.href !== "/dashboard" &&
+              pathname.startsWith(`${link.href}/`));
 
-        <Link
-          href="/dashboard/settings"
-          className="hover:text-blue-400 transition"
-        >
-          Settings
-        </Link>
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              aria-current={active ? "page" : undefined}
+              className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
+                active
+                  ? "bg-blue-600 text-white shadow-sm"
+                  : "text-slate-300 hover:bg-slate-800 hover:text-white"
+              }`}
+            >
+              <span className="text-lg" aria-hidden="true">
+                {link.icon}
+              </span>
+
+              <span>{link.label}</span>
+            </Link>
+          );
+        })}
       </nav>
+
+      {/* FOOTER */}
+      <div className="border-t border-slate-800 px-6 py-5">
+        <p className="text-xs text-slate-400">
+          ClientFlow CRM
+        </p>
+
+        <p className="mt-1 text-xs text-slate-500">
+          © {new Date().getFullYear()} All rights reserved.
+        </p>
+      </div>
     </aside>
   );
 }

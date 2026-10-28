@@ -7,7 +7,35 @@ export const auth = betterAuth({
   database: pool,
 
   baseURL: process.env.BETTER_AUTH_URL,
+  rateLimit: {
+  enabled: true,
+  storage: "database",
 
+  window: 60,
+  max: 60,
+
+  customRules: {
+    "/sign-in/email": {
+      window: 60,
+      max: 5,
+    },
+
+    "/sign-up/email": {
+      window: 600,
+      max: 3,
+    },
+
+    "/request-password-reset": {
+      window: 900,
+      max: 3,
+    },
+
+    "/reset-password": {
+      window: 300,
+      max: 5,
+    },
+  },
+},
   emailAndPassword: {
     enabled: true,
 
@@ -75,3 +103,4 @@ The ClientFlow Team
     },
   },
 });
+
